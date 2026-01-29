@@ -88,6 +88,7 @@ Required in `.env` (see `.env.example`):
 Migrations live in `supabase/migrations/` and are applied with `npx supabase db reset`.
 
 - `00001_create_trainer_profiles.sql` — `trainer_profiles` table with PostGIS, RLS, indexes, and `updated_at` trigger.
+- `00002_create_user_profiles.sql` — `user_profiles` table with fitness data, body metrics, PostGIS location, RLS, and indexes.
 
 ### `trainer_profiles` Table
 
@@ -116,6 +117,34 @@ Migrations live in `supabase/migrations/` and are applied with `npx supabase db 
 
 **Indexes:** GiST on `location`, GIN on `specializations`, partial on `is_available = true`.
 
+### `user_profiles` Table
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | uuid PK | auto-generated |
+| `user_id` | uuid FK → auth.users | unique, cascade delete |
+| `display_name` | text | required |
+| `avatar_url` | text | |
+| `phone` | text | |
+| `date_of_birth` | date | |
+| `gender` | text | |
+| `bio` | text | |
+| `height_cm` | numeric(5,1) | > 0 |
+| `weight_kg` | numeric(5,1) | > 0 |
+| `fitness_level` | text | beginner, intermediate, or advanced |
+| `fitness_goals` | text[] | e.g. `{weight_loss, muscle_gain}` |
+| `health_conditions` | text[] | e.g. `{knee_injury, asthma}` |
+| `preferred_training_style` | text[] | e.g. `{one_on_one, group, online}` |
+| `location` | geography(Point, 4326) | PostGIS, for radius-based trainer matching |
+| `city` | text | |
+| `country` | text | |
+| `created_at` | timestamptz | auto |
+| `updated_at` | timestamptz | auto via trigger |
+
+**RLS policies:** authenticated users can SELECT all profiles; INSERT/UPDATE/DELETE restricted to own profile (`auth.uid() = user_id`).
+
+**Indexes:** GiST on `location`, GIN on `fitness_goals`.
+
 ## Supabase Edge Functions
 
 Edge Functions live in `supabase/functions/<name>/index.ts` (Deno/TypeScript). Shared utilities are in `supabase/functions/_shared/`.
@@ -143,6 +172,17 @@ Auth: reads `Authorization: Bearer <jwt>` header, creates a Supabase client scop
 
 Location input: `{"lat": 40.71, "lng": -74.00}` → converted to WKT `POINT(-74.00 40.71)` for PostGIS.
 
+### `user-profile` Function
+
+Single function with HTTP method routing for CRUD on `user_profiles`:
+
+- **POST** — Create profile. Forces `user_id` to authenticated user. Returns 409 on duplicate.
+- **GET** — Get own profile (no params) or any profile by `?id=<uuid>`.
+- **PUT** — Partial update. Strips protected fields (`user_id`, `id`, `created_at`).
+- **DELETE** — Delete own profile.
+
+Auth & location handling identical to `trainer-profile`.
+
 ### Shared modules
 
 - `supabase/functions/_shared/cors.ts` — CORS headers used by all Edge Functions.
@@ -150,3 +190,4 @@ Location input: `{"lat": 40.71, "lng": -74.00}` → converted to WKT `POINT(-74.
 ## Scripts
 
 - `scripts/trainer-profile-requests.sh` — Curl script to sign in, create a trainer profile, retrieve it, and update it against local Supabase. Run with `bash scripts/trainer-profile-requests.sh`.
+- `scripts/user-profile-requests.sh` — Curl script to sign in, create a user profile, retrieve it, and update it against local Supabase. Run with `bash scripts/user-profile-requests.sh`.
