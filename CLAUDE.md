@@ -164,13 +164,29 @@ npx supabase functions serve --no-verify-jwt     # Serve all Edge Functions
 Single function with HTTP method routing for CRUD on `trainer_profiles`:
 
 - **POST** — Create profile. Forces `user_id` to authenticated user. Returns 409 on duplicate.
-- **GET** — Get own profile (no params) or any profile by `?id=<uuid>`.
+- **GET** — Get own profile (no params), any profile by `?id=<uuid>`, or list/search with `?list=true`.
 - **PUT** — Partial update. Strips protected fields (`user_id`, `is_verified`, `id`, `created_at`).
 - **DELETE** — Delete own profile.
+
+**List/search** (`GET ?list=true`): returns paginated trainer profiles with optional filters:
+- `search` — partial match on display_name (ilike)
+- `specialization` — filter by specialization (array contains)
+- `city`, `country` — partial match (ilike)
+- `min_rate`, `max_rate` — hourly_rate range
+- `min_experience`, `max_experience` — experience_years range
+- `available` — filter by is_available (default true, set `false` to show all)
+- `page`, `per_page` — pagination (default page=1, per_page=12, max 50)
+- Returns `{ data: [...], count, page, per_page }`
 
 Auth: reads `Authorization: Bearer <jwt>` header, creates a Supabase client scoped to that user so RLS applies automatically.
 
 Location input: `{"lat": 40.71, "lng": -74.00}` → converted to WKT `POINT(-74.00 40.71)` for PostGIS.
+
+### Trainer Discovery Page
+
+- **Route:** `/protected/trainers` — Server Component page that renders the `<TrainerDiscovery />` client component.
+- **`components/trainer-discovery.tsx`** — Client Component with filter bar (search, specialization, city, country, rate range, experience range), results grid, and pagination. Fetches data from the `trainer-profile` Edge Function via raw `fetch`.
+- **`components/trainer-card.tsx`** — Displays a trainer profile card with avatar initial, name, location, bio, specialization badges, experience, and hourly rate.
 
 ### `user-profile` Function
 

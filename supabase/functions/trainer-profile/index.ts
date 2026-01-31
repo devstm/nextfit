@@ -1,6 +1,6 @@
 // deno-lint-ignore-file
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
-import { corsHeaders } from "../_shared/cors";
+import { corsHeaders } from "../_shared/cors.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -182,7 +182,9 @@ async function handleGet(
 ): Promise<Response> {
   const url = new URL(req.url);
   const profileId = url.searchParams.get("id");
+  const isList = url.searchParams.get("list") === "true";
 
+  // Single profile by id
   if (profileId) {
     const { data, error } = await supabase
       .from("trainer_profiles")
@@ -196,7 +198,12 @@ async function handleGet(
     return jsonResponse({ data });
   }
 
-  // No id param — return the caller's own profile
+  // List/search mode
+  if (isList) {
+    return await handleList(supabase, url);
+  }
+
+  // No id param and not list — return the caller's own profile
   const { data, error } = await supabase
     .from("trainer_profiles")
     .select("*")
@@ -207,6 +214,86 @@ async function handleGet(
     return jsonResponse({ error: "Profile not found" }, 404);
   }
   return jsonResponse({ data });
+}
+
+async function handleList(
+  supabase: SupabaseClient,
+  url: URL,
+): Promise<Response> {
+  const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
+  const perPage = Math.min(50, Math.max(1, parseInt(url.searchParams.get("per_page") || "12", 10)));
+  const from = (page - 1) * perPage;
+  const to = from + perPage - 1;
+
+  let query = supabase
+    .from("trainer_profiles")
+    .select("*", { count: "exact" });
+
+  // Search by display_name
+  const search = url.searchParams.get("search");
+  if (search) {
+    query = query.ilike("display_name", `%${search}%`);
+  }
+
+  // Filter by specialization (array contains)
+  const specialization = url.searchParams.get("specialization");
+  if (specialization) {
+    query = query.contains("specializations", [specialization]);
+  }
+
+  // Filter by city
+  const city = url.searchParams.get("city");
+  if (city) {
+    query = query.ilike("city", `%${city}%`);
+  }
+
+  // Filter by country
+  const country = url.searchParams.get("country");
+  if (country) {
+    query = query.ilike("country", `%${country}%`);
+  }
+
+  // Filter by hourly_rate range
+  const minRate = url.searchParams.get("min_rate");
+  if (minRate) {
+    query = query.gte("hourly_rate", parseFloat(minRate));
+  }
+  const maxRate = url.searchParams.get("max_rate");
+  if (maxRate) {
+    query = query.lte("hourly_rate", parseFloat(maxRate));
+  }
+
+  // Filter by experience_years range
+  const minExp = url.searchParams.get("min_experience");
+  if (minExp) {
+    query = query.gte("experience_years", parseInt(minExp, 10));
+  }
+  const maxExp = url.searchParams.get("max_experience");
+  if (maxExp) {
+    query = query.lte("experience_years", parseInt(maxExp, 10));
+  }
+
+  // Filter by availability (default: show only available)
+  const available = url.searchParams.get("available");
+  if (available !== "false") {
+    query = query.eq("is_available", true);
+  }
+
+  // Pagination and ordering
+  query = query.order("created_at", { ascending: false }).range(from, to);
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    return jsonResponse({ error: error.message }, 400);
+  }
+
+  return jsonResponse({
+    data: data || [],
+    count: count || 0,
+    page,
+    per_page: perPage,
+  });
 }
 
 async function handlePost(
