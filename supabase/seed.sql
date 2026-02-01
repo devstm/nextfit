@@ -11,7 +11,7 @@ SELECT
   'authenticated',
   'authenticated',
   'trainer' || i || '@example.com',
-  crypt('password123', gen_salt('bf')),
+  extensions.crypt('password123', extensions.gen_salt('bf')),
   now(),
   now(),
   now(),
@@ -47,7 +47,7 @@ VALUES
  ARRAY['weight_loss', 'hiit', 'nutrition'],
  '[{"name":"NASM-CPT","issuer":"NASM","year":2018},{"name":"Precision Nutrition L1","issuer":"Precision Nutrition","year":2019}]'::jsonb,
  6,
- ST_MakePoint(-74.006, 40.7128)::extensions.geography,
+ extensions.ST_MakePoint(-74.006, 40.7128)::extensions.geography,
  'New York', 'US',
  85.00, 'USD', true, true),
 
@@ -59,7 +59,7 @@ VALUES
  ARRAY['strength_training', 'powerlifting'],
  '[{"name":"CSCS","issuer":"NSCA","year":2016}]'::jsonb,
  8,
- ST_MakePoint(-73.985, 40.748)::extensions.geography,
+ extensions.ST_MakePoint(-73.985, 40.748)::extensions.geography,
  'New York', 'US',
  120.00, 'USD', true, true),
 
@@ -71,7 +71,7 @@ VALUES
  ARRAY['yoga', 'flexibility', 'meditation'],
  '[{"name":"RYT-500","issuer":"Yoga Alliance","year":2017},{"name":"Restorative Yoga Cert","issuer":"YogaWorks","year":2019}]'::jsonb,
  9,
- ST_MakePoint(-118.2437, 33.9425)::extensions.geography,
+ extensions.ST_MakePoint(-118.2437, 33.9425)::extensions.geography,
  'Los Angeles', 'US',
  95.00, 'USD', true, true),
 
@@ -83,7 +83,7 @@ VALUES
  ARRAY['crossfit', 'functional_training', 'olympic_lifting'],
  '[{"name":"CrossFit L2","issuer":"CrossFit","year":2020}]'::jsonb,
  5,
- ST_MakePoint(-118.3287, 34.0195)::extensions.geography,
+ extensions.ST_MakePoint(-118.3287, 34.0195)::extensions.geography,
  'Los Angeles', 'US',
  110.00, 'USD', true, false),
 
@@ -95,7 +95,7 @@ VALUES
  ARRAY['rehabilitation', 'posture_correction', 'flexibility'],
  '[{"name":"CIMSPA Level 4","issuer":"CIMSPA","year":2015},{"name":"Sports Rehab Diploma","issuer":"Premier Training","year":2016}]'::jsonb,
  11,
- ST_MakePoint(-0.1276, 51.5074)::extensions.geography,
+ extensions.ST_MakePoint(-0.1276, 51.5074)::extensions.geography,
  'London', 'GB',
  75.00, 'GBP', true, true),
 
@@ -107,7 +107,7 @@ VALUES
  ARRAY['boxing', 'cardio', 'weight_loss'],
  '[{"name":"Level 3 PT","issuer":"Active IQ","year":2019}]'::jsonb,
  4,
- ST_MakePoint(-0.0877, 51.5155)::extensions.geography,
+ extensions.ST_MakePoint(-0.0877, 51.5155)::extensions.geography,
  'London', 'GB',
  60.00, 'GBP', true, false),
 
@@ -119,7 +119,7 @@ VALUES
  ARRAY['bodybuilding', 'nutrition', 'strength_training'],
  '[{"name":"IFBB Pro Card","issuer":"IFBB","year":2012},{"name":"Sports Nutrition Cert","issuer":"ISSN","year":2014}]'::jsonb,
  15,
- ST_MakePoint(55.2708, 25.2048)::extensions.geography,
+ extensions.ST_MakePoint(55.2708, 25.2048)::extensions.geography,
  'Dubai', 'AE',
  200.00, 'USD', true, true),
 
@@ -131,7 +131,7 @@ VALUES
  ARRAY['prenatal', 'postnatal', 'weight_loss', 'yoga'],
  '[{"name":"Pre/Postnatal Cert","issuer":"ETA","year":2020},{"name":"ACE-CPT","issuer":"ACE","year":2018}]'::jsonb,
  6,
- ST_MakePoint(55.3094, 25.2582)::extensions.geography,
+ extensions.ST_MakePoint(55.3094, 25.2582)::extensions.geography,
  'Dubai', 'AE',
  150.00, 'USD', true, true),
 
@@ -143,7 +143,7 @@ VALUES
  ARRAY['endurance', 'running', 'triathlon'],
  '[{"name":"DOSB Trainer A","issuer":"DOSB","year":2014}]'::jsonb,
  12,
- ST_MakePoint(13.405, 52.52)::extensions.geography,
+ extensions.ST_MakePoint(13.405, 52.52)::extensions.geography,
  'Berlin', 'DE',
  70.00, 'EUR', true, true),
 
@@ -155,7 +155,7 @@ VALUES
  ARRAY['pilates', 'core_training', 'posture_correction'],
  '[{"name":"Comprehensive Pilates","issuer":"Pilates Center Boulder","year":2017}]'::jsonb,
  7,
- ST_MakePoint(13.3889, 52.5170)::extensions.geography,
+ extensions.ST_MakePoint(13.3889, 52.5170)::extensions.geography,
  'Berlin', 'DE',
  65.00, 'EUR', true, false),
 
@@ -167,7 +167,7 @@ VALUES
  ARRAY['senior_fitness', 'balance', 'mobility'],
  '[{"name":"CSEP-CPT","issuer":"CSEP","year":2016},{"name":"Senior Fitness Specialist","issuer":"ACE","year":2018}]'::jsonb,
  10,
- ST_MakePoint(-79.3832, 43.6532)::extensions.geography,
+ extensions.ST_MakePoint(-79.3832, 43.6532)::extensions.geography,
  'Toronto', 'CA',
  70.00, 'CAD', true, true),
 
@@ -179,7 +179,7 @@ VALUES
  ARRAY['mma', 'martial_arts', 'functional_training', 'cardio'],
  '[{"name":"BJJ Black Belt","issuer":"IBJJF","year":2015},{"name":"CanFitPro PTS","issuer":"CanFitPro","year":2017}]'::jsonb,
  13,
- ST_MakePoint(-79.4000, 43.6600)::extensions.geography,
+ extensions.ST_MakePoint(-79.4000, 43.6600)::extensions.geography,
  'Toronto', 'CA',
  90.00, 'CAD', true, true),
 
@@ -191,7 +191,7 @@ VALUES
  ARRAY['weight_loss', 'nutrition', 'home_workouts'],
  '[{"name":"Certificate IV Fitness","issuer":"Fitness Australia","year":2019}]'::jsonb,
  3,
- ST_MakePoint(151.2093, -33.8688)::extensions.geography,
+ extensions.ST_MakePoint(151.2093, -33.8688)::extensions.geography,
  'Sydney', 'AU',
  55.00, 'AUD', true, false),
 
@@ -203,7 +203,7 @@ VALUES
  ARRAY['calisthenics', 'bodyweight', 'functional_training'],
  '[{"name":"Certificate III & IV","issuer":"Fitness Australia","year":2020}]'::jsonb,
  4,
- ST_MakePoint(151.2150, -33.8560)::extensions.geography,
+ extensions.ST_MakePoint(151.2150, -33.8560)::extensions.geography,
  'Sydney', 'AU',
  65.00, 'AUD', true, true),
 
@@ -215,7 +215,7 @@ VALUES
  ARRAY['swimming', 'endurance', 'triathlon'],
  '[{"name":"BPJEPS AAN","issuer":"French Ministry of Sports","year":2013}]'::jsonb,
  14,
- ST_MakePoint(2.3522, 48.8566)::extensions.geography,
+ extensions.ST_MakePoint(2.3522, 48.8566)::extensions.geography,
  'Paris', 'FR',
  80.00, 'EUR', true, true),
 
@@ -227,7 +227,7 @@ VALUES
  ARRAY['dance_fitness', 'cardio', 'weight_loss'],
  '[{"name":"Zumba B1","issuer":"Zumba","year":2018},{"name":"BPJEPS APT","issuer":"French Ministry of Sports","year":2017}]'::jsonb,
  5,
- ST_MakePoint(2.3400, 48.8600)::extensions.geography,
+ extensions.ST_MakePoint(2.3400, 48.8600)::extensions.geography,
  'Paris', 'FR',
  50.00, 'EUR', true, false),
 
@@ -239,7 +239,7 @@ VALUES
  ARRAY['strength_training', 'nutrition', 'weight_loss'],
  '[{"name":"NASM-CPT","issuer":"NASM","year":2017},{"name":"Precision Nutrition L2","issuer":"Precision Nutrition","year":2021}]'::jsonb,
  7,
- ST_MakePoint(-87.6298, 41.8781)::extensions.geography,
+ extensions.ST_MakePoint(-87.6298, 41.8781)::extensions.geography,
  'Chicago', 'US',
  95.00, 'USD', true, true),
 
@@ -251,7 +251,7 @@ VALUES
  ARRAY['hiit', 'cardio', 'weight_loss', 'functional_training'],
  '[{"name":"ACE-GFI","issuer":"ACE","year":2020}]'::jsonb,
  3,
- ST_MakePoint(-87.6500, 41.8900)::extensions.geography,
+ extensions.ST_MakePoint(-87.6500, 41.8900)::extensions.geography,
  'Chicago', 'US',
  70.00, 'USD', true, false),
 
@@ -263,7 +263,7 @@ VALUES
  ARRAY['sports_performance', 'speed_agility', 'strength_training', 'olympic_lifting'],
  '[{"name":"CSCS","issuer":"NSCA","year":2015},{"name":"USAW L2","issuer":"USA Weightlifting","year":2017}]'::jsonb,
  10,
- ST_MakePoint(-80.1918, 25.7617)::extensions.geography,
+ extensions.ST_MakePoint(-80.1918, 25.7617)::extensions.geography,
  'Miami', 'US',
  130.00, 'USD', true, true),
 
@@ -275,7 +275,7 @@ VALUES
  ARRAY['bodybuilding', 'weight_loss', 'nutrition'],
  '[{"name":"ISSA-CPT","issuer":"ISSA","year":2019}]'::jsonb,
  4,
- ST_MakePoint(-80.1300, 25.7900)::extensions.geography,
+ extensions.ST_MakePoint(-80.1300, 25.7900)::extensions.geography,
  'Miami', 'US',
  80.00, 'USD', true, true),
 
@@ -287,7 +287,7 @@ VALUES
  ARRAY['adaptive_fitness', 'rehabilitation', 'strength_training'],
  '[{"name":"Level 4 Disability PT","issuer":"YMCA Awards","year":2018}]'::jsonb,
  8,
- ST_MakePoint(-0.1180, 51.5095)::extensions.geography,
+ extensions.ST_MakePoint(-0.1180, 51.5095)::extensions.geography,
  'London', 'GB',
  65.00, 'GBP', true, true),
 
@@ -299,7 +299,7 @@ VALUES
  ARRAY['kettlebell', 'strength_training', 'endurance'],
  '[{"name":"Master of Sport","issuer":"Russian Kettlebell Federation","year":2010}]'::jsonb,
  16,
- ST_MakePoint(37.6173, 55.7558)::extensions.geography,
+ extensions.ST_MakePoint(37.6173, 55.7558)::extensions.geography,
  'Moscow', 'RU',
  40.00, 'USD', true, false),
 
@@ -311,7 +311,7 @@ VALUES
  ARRAY['prenatal', 'yoga', 'meditation', 'flexibility'],
  '[{"name":"RPYT","issuer":"Yoga Alliance","year":2019}]'::jsonb,
  5,
- ST_MakePoint(72.8777, 19.0760)::extensions.geography,
+ extensions.ST_MakePoint(72.8777, 19.0760)::extensions.geography,
  'Mumbai', 'IN',
  25.00, 'USD', true, true),
 
@@ -323,7 +323,7 @@ VALUES
  ARRAY['sports_performance', 'speed_agility', 'functional_training'],
  '[{"name":"NSCA-CSCS","issuer":"NSCA","year":2018}]'::jsonb,
  7,
- ST_MakePoint(72.8500, 19.0600)::extensions.geography,
+ extensions.ST_MakePoint(72.8500, 19.0600)::extensions.geography,
  'Mumbai', 'IN',
  30.00, 'USD', true, false),
 
@@ -335,7 +335,7 @@ VALUES
  ARRAY['trx', 'functional_training', 'core_training', 'home_workouts'],
  '[{"name":"TRX STC","issuer":"TRX Training","year":2019},{"name":"ACE-CPT","issuer":"ACE","year":2018}]'::jsonb,
  6,
- ST_MakePoint(103.8198, 1.3521)::extensions.geography,
+ extensions.ST_MakePoint(103.8198, 1.3521)::extensions.geography,
  'Singapore', 'SG',
  100.00, 'USD', true, true),
 
@@ -347,7 +347,7 @@ VALUES
  ARRAY['martial_arts', 'boxing', 'cardio', 'weight_loss'],
  '[{"name":"Kru Level 3","issuer":"WMC","year":2014}]'::jsonb,
  12,
- ST_MakePoint(100.5018, 13.7563)::extensions.geography,
+ extensions.ST_MakePoint(100.5018, 13.7563)::extensions.geography,
  'Bangkok', 'TH',
  35.00, 'USD', true, true),
 
@@ -359,7 +359,7 @@ VALUES
  ARRAY['olympic_lifting', 'strength_training', 'sports_performance'],
  '[{"name":"JAWA Coach Level 3","issuer":"Japan Weightlifting Association","year":2013}]'::jsonb,
  14,
- ST_MakePoint(139.6917, 35.6895)::extensions.geography,
+ extensions.ST_MakePoint(139.6917, 35.6895)::extensions.geography,
  'Tokyo', 'JP',
  90.00, 'USD', true, true),
 
@@ -371,7 +371,7 @@ VALUES
  ARRAY['yoga', 'meditation', 'flexibility', 'mobility'],
  '[{"name":"RYT-200","issuer":"Yoga Alliance","year":2018}]'::jsonb,
  6,
- ST_MakePoint(115.1889, -8.4095)::extensions.geography,
+ extensions.ST_MakePoint(115.1889, -8.4095)::extensions.geography,
  'Bali', 'ID',
  40.00, 'USD', true, false),
 
@@ -383,7 +383,7 @@ VALUES
  ARRAY['strongman', 'strength_training', 'powerlifting'],
  '[{"name":"NSCA-CSCS","issuer":"NSCA","year":2016}]'::jsonb,
  11,
- ST_MakePoint(-21.8174, 64.1466)::extensions.geography,
+ extensions.ST_MakePoint(-21.8174, 64.1466)::extensions.geography,
  'Reykjavik', 'IS',
  85.00, 'EUR', true, true),
 
@@ -395,7 +395,7 @@ VALUES
  ARRAY['climbing', 'functional_training', 'flexibility', 'core_training'],
  '[{"name":"NASM-CPT","issuer":"NASM","year":2020}]'::jsonb,
  4,
- ST_MakePoint(-104.9903, 39.7392)::extensions.geography,
+ extensions.ST_MakePoint(-104.9903, 39.7392)::extensions.geography,
  'Denver', 'US',
  75.00, 'USD', true, false),
 
@@ -407,7 +407,7 @@ VALUES
  ARRAY['weight_loss', 'nutrition', 'senior_fitness'],
  '[{"name":"ACE-CPT","issuer":"ACE","year":2015},{"name":"ACE Medical Exercise Specialist","issuer":"ACE","year":2017}]'::jsonb,
  9,
- ST_MakePoint(-95.3698, 29.7604)::extensions.geography,
+ extensions.ST_MakePoint(-95.3698, 29.7604)::extensions.geography,
  'Houston', 'US',
  90.00, 'USD', true, true),
 
@@ -419,7 +419,7 @@ VALUES
  ARRAY['postnatal', 'core_training', 'rehabilitation', 'pilates'],
  '[{"name":"NASM-CPT","issuer":"NASM","year":2018},{"name":"Pre/Postnatal Coach","issuer":"Girls Gone Strong","year":2020}]'::jsonb,
  5,
- ST_MakePoint(-122.4194, 37.7749)::extensions.geography,
+ extensions.ST_MakePoint(-122.4194, 37.7749)::extensions.geography,
  'San Francisco', 'US',
  110.00, 'USD', true, true),
 
@@ -431,7 +431,7 @@ VALUES
  ARRAY['weight_loss', 'strength_training', 'cardio'],
  '[{"name":"CONADE Cert","issuer":"CONADE","year":2019}]'::jsonb,
  3,
- ST_MakePoint(-99.1332, 19.4326)::extensions.geography,
+ extensions.ST_MakePoint(-99.1332, 19.4326)::extensions.geography,
  'Mexico City', 'MX',
  20.00, 'USD', true, false),
 
@@ -443,7 +443,7 @@ VALUES
  ARRAY['bodybuilding', 'nutrition', 'weight_loss', 'hiit'],
  '[{"name":"NASM-CPT","issuer":"NASM","year":2012},{"name":"NASM-CNC","issuer":"NASM","year":2014},{"name":"NASM-PES","issuer":"NASM","year":2015}]'::jsonb,
  14,
- ST_MakePoint(-118.4065, 34.0736)::extensions.geography,
+ extensions.ST_MakePoint(-118.4065, 34.0736)::extensions.geography,
  'Los Angeles', 'US',
  300.00, 'USD', true, true),
 
@@ -455,7 +455,7 @@ VALUES
  ARRAY['strength_training', 'sports_performance'],
  '[{"name":"CSCS","issuer":"NSCA","year":2017}]'::jsonb,
  8,
- ST_MakePoint(-74.000, 40.730)::extensions.geography,
+ extensions.ST_MakePoint(-74.000, 40.730)::extensions.geography,
  'New York', 'US',
  100.00, 'USD', false, true),
 
@@ -467,7 +467,7 @@ VALUES
  ARRAY['hiit', 'cardio', 'group_fitness'],
  '[{"name":"Level 3 PT","issuer":"Active IQ","year":2018}]'::jsonb,
  5,
- ST_MakePoint(-0.1000, 51.5200)::extensions.geography,
+ extensions.ST_MakePoint(-0.1000, 51.5200)::extensions.geography,
  'London', 'GB',
  55.00, 'GBP', false, false),
 
@@ -479,7 +479,7 @@ VALUES
  ARRAY['weight_loss', 'cardio'],
  '[{"name":"ACE-CPT","issuer":"ACE","year":2024}]'::jsonb,
  0,
- ST_MakePoint(-97.7431, 30.2672)::extensions.geography,
+ extensions.ST_MakePoint(-97.7431, 30.2672)::extensions.geography,
  'Austin', 'US',
  35.00, 'USD', true, false),
 
@@ -491,7 +491,7 @@ VALUES
  ARRAY['sports_performance', 'strength_training', 'rehabilitation'],
  '[{"name":"CREF","issuer":"CONFEF","year":2005},{"name":"NSCA-CSCS","issuer":"NSCA","year":2008}]'::jsonb,
  20,
- ST_MakePoint(-46.6333, -23.5505)::extensions.geography,
+ extensions.ST_MakePoint(-46.6333, -23.5505)::extensions.geography,
  'Sao Paulo', 'BR',
  60.00, 'USD', true, true),
 
@@ -503,7 +503,7 @@ VALUES
  ARRAY['bootcamp', 'cardio', 'functional_training', 'endurance'],
  '[{"name":"HFPA Cert","issuer":"HFPA","year":2019}]'::jsonb,
  5,
- ST_MakePoint(18.4241, -33.9249)::extensions.geography,
+ extensions.ST_MakePoint(18.4241, -33.9249)::extensions.geography,
  'Cape Town', 'ZA',
  30.00, 'USD', true, true),
 
@@ -515,7 +515,7 @@ VALUES
  ARRAY['nutrition', 'weight_loss'],
  '[{"name":"Precision Nutrition L1","issuer":"Precision Nutrition","year":2020}]'::jsonb,
  3,
- ST_MakePoint(4.9041, 52.3676)::extensions.geography,
+ extensions.ST_MakePoint(4.9041, 52.3676)::extensions.geography,
  'Amsterdam', 'NL',
  55.00, 'EUR', true, false),
 
@@ -527,7 +527,7 @@ VALUES
  ARRAY['senior_fitness', 'balance', 'mobility', 'rehabilitation'],
  '[{"name":"Laurea in Scienze Motorie","issuer":"Università di Roma","year":2008}]'::jsonb,
  17,
- ST_MakePoint(12.4964, 41.9028)::extensions.geography,
+ extensions.ST_MakePoint(12.4964, 41.9028)::extensions.geography,
  'Rome', 'IT',
  45.00, 'EUR', true, true),
 
@@ -539,7 +539,7 @@ VALUES
  ARRAY['hiit', 'dance_fitness', 'cardio', 'group_fitness'],
  '[{"name":"KATA Level 2","issuer":"Korea Athletic Trainers Association","year":2020}]'::jsonb,
  4,
- ST_MakePoint(126.9780, 37.5665)::extensions.geography,
+ extensions.ST_MakePoint(126.9780, 37.5665)::extensions.geography,
  'Seoul', 'KR',
  50.00, 'USD', true, true),
 
@@ -551,7 +551,7 @@ VALUES
  ARRAY['mobility', 'flexibility', 'posture_correction', 'rehabilitation'],
  '[{"name":"FRC Mobility Specialist","issuer":"Functional Anatomy Seminars","year":2019}]'::jsonb,
  6,
- ST_MakePoint(2.1734, 41.3851)::extensions.geography,
+ extensions.ST_MakePoint(2.1734, 41.3851)::extensions.geography,
  'Barcelona', 'ES',
  60.00, 'EUR', true, true),
 
@@ -563,7 +563,7 @@ VALUES
  ARRAY['nutrition', 'strength_training', 'bodybuilding'],
  '[{"name":"NASM-CPT","issuer":"NASM","year":2019},{"name":"Plant-Based Nutrition Cert","issuer":"T. Colin Campbell Center","year":2020}]'::jsonb,
  5,
- ST_MakePoint(-122.6765, 45.5152)::extensions.geography,
+ extensions.ST_MakePoint(-122.6765, 45.5152)::extensions.geography,
  'Portland', 'US',
  75.00, 'USD', true, false),
 
@@ -575,7 +575,7 @@ VALUES
  ARRAY['youth_fitness', 'functional_training', 'speed_agility'],
  '[{"name":"ACE Youth Fitness Specialist","issuer":"ACE","year":2019}]'::jsonb,
  7,
- ST_MakePoint(55.2800, 25.2200)::extensions.geography,
+ extensions.ST_MakePoint(55.2800, 25.2200)::extensions.geography,
  'Dubai', 'AE',
  80.00, 'USD', true, true),
 
@@ -587,7 +587,7 @@ VALUES
  ARRAY['adaptive_fitness', 'sports_performance', 'strength_training', 'cardio'],
  '[{"name":"CSEP-CPT","issuer":"CSEP","year":2017},{"name":"Adaptive Fitness Specialist","issuer":"ACSM","year":2019}]'::jsonb,
  8,
- ST_MakePoint(-79.3700, 43.6700)::extensions.geography,
+ extensions.ST_MakePoint(-79.3700, 43.6700)::extensions.geography,
  'Toronto', 'CA',
  75.00, 'CAD', true, true),
 
@@ -599,7 +599,7 @@ VALUES
  ARRAY['corporate_wellness', 'posture_correction', 'yoga', 'meditation'],
  '[{"name":"ACE-CPT","issuer":"ACE","year":2017},{"name":"Corporate Wellness Cert","issuer":"NASM","year":2019}]'::jsonb,
  7,
- ST_MakePoint(103.8500, 1.2900)::extensions.geography,
+ extensions.ST_MakePoint(103.8500, 1.2900)::extensions.geography,
  'Singapore', 'SG',
  120.00, 'USD', true, true),
 
@@ -611,7 +611,7 @@ VALUES
  ARRAY['parkour', 'functional_training', 'calisthenics', 'mobility'],
  '[{"name":"BPJEPS APT","issuer":"French Ministry of Sports","year":2018}]'::jsonb,
  6,
- ST_MakePoint(2.3700, 48.8500)::extensions.geography,
+ extensions.ST_MakePoint(2.3700, 48.8500)::extensions.geography,
  'Paris', 'FR',
  55.00, 'EUR', true, false),
 
@@ -623,7 +623,7 @@ VALUES
  ARRAY['sports_performance', 'strength_training', 'speed_agility'],
  '[{"name":"JASA-AT","issuer":"Japan Sport Association","year":2012}]'::jsonb,
  18,
- ST_MakePoint(139.7000, 35.7000)::extensions.geography,
+ extensions.ST_MakePoint(139.7000, 35.7000)::extensions.geography,
  'Tokyo', 'JP',
  250.00, 'USD', false, true),
 
@@ -635,6 +635,6 @@ VALUES
  ARRAY['yoga', 'powerlifting', 'hiit', 'rehabilitation', 'nutrition', 'weight_loss', 'flexibility'],
  '[{"name":"DOSB Trainer B","issuer":"DOSB","year":2015},{"name":"RYT-200","issuer":"Yoga Alliance","year":2017},{"name":"Precision Nutrition L1","issuer":"Precision Nutrition","year":2019}]'::jsonb,
  10,
- ST_MakePoint(13.4050, 52.5200)::extensions.geography,
+ extensions.ST_MakePoint(13.4050, 52.5200)::extensions.geography,
  'Berlin', 'DE',
  75.00, 'EUR', true, true);

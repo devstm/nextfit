@@ -89,6 +89,14 @@ export function TrainerDiscovery() {
       if (currentFilters.minExperience) params.set("min_experience", currentFilters.minExperience);
       if (currentFilters.maxExperience) params.set("max_experience", currentFilters.maxExperience);
 
+      // getUser() validates the token server-side and triggers a refresh if expired
+      const { error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        setError("You must be logged in to browse trainers.");
+        setLoading(false);
+        return;
+      }
+
       const {
         data: { session },
       } = await supabase.auth.getSession();

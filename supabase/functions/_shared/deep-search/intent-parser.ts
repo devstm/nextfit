@@ -1,11 +1,11 @@
-import type { SearchIntent } from "./types";
+import type { SearchIntent } from "./types.ts";
 import {
   GOAL_KEYWORDS,
   STYLE_KEYWORDS,
   LEVEL_KEYWORDS,
   HEALTH_KEYWORDS,
   BUDGET_PATTERNS,
-} from "./keyword-maps";
+} from "./keyword-maps.ts";
 
 /**
  * Parse a free-text search query into structured search intent.

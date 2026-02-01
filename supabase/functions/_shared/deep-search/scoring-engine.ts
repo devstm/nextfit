@@ -1,4 +1,4 @@
-import type { SearchIntent, TrainerForScoring, ScoredTrainer } from "./types";
+import type { SearchIntent, TrainerForScoring, ScoredTrainer } from "./types.ts";
 
 /**
  * Score and rank trainers against a parsed search intent.
