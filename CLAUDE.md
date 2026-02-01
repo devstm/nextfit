@@ -9,8 +9,10 @@ Nexfiit is an AI-driven fitness ecosystem connecting fitness seekers with person
 ### Deep Search (Core Innovation)
 
 - Accepts free-text queries like "Lose weight after pregnancy" or "Rehab after knee injury"
-- Extracts intent, goals, and preferences to match trainer specializations and club facilities
-- Scoring system: Goal + Style + Level + Location
+- **Rule-based intent parser** extracts goals, training style, fitness level, city, budget, and health conditions from natural language
+- **Scoring engine** ranks trainers on a 100-point scale: Goal (0-40) + Style (0-20, MVP: always 20) + Level (0-20) + Location (0-20)
+- Implemented as pure TypeScript modules in `supabase/functions/_shared/deep-search/`
+- Exposed via the `deep-search` Edge Function (`GET ?q=<free-text>`)
 
 ### Business Model
 
@@ -40,9 +42,11 @@ npm run dev      # Dev server at http://localhost:3000
 npm run build    # Production build
 npm run start    # Start production server
 npm run lint     # ESLint (flat config, next/core-web-vitals + next/typescript)
+npm test         # Run Vitest unit tests (63 tests)
+npm run test:watch  # Run Vitest in watch mode
 ```
 
-No test framework is configured yet.
+**Testing:** Vitest is configured via `vitest.config.ts`. Test files live alongside source modules in `supabase/functions/_shared/deep-search/` (co-located pattern). Tests cover the intent parser (36 tests) and scoring engine (27 tests).
 
 **Supabase local dev** runs on: API :54321, DB :54322, Studio :54323, Inbucket (email) :54324.
 
@@ -80,6 +84,10 @@ Required in `.env` (see `.env.example`):
 ### Path Alias
 
 `@/*` maps to the project root (configured in `tsconfig.json`).
+
+### TypeScript Configuration
+
+`tsconfig.json` excludes `supabase/functions` because Edge Functions use Deno-style `.ts` extension imports that are incompatible with the Next.js/bundler module resolution. Vitest has its own resolution and handles these files independently.
 
 ## Database
 
@@ -199,6 +207,27 @@ Single function with HTTP method routing for CRUD on `user_profiles`:
 
 Auth & location handling identical to `trainer-profile`.
 
+### `deep-search` Function
+
+Intent-based trainer search. GET-only endpoint that parses free-text queries and returns scored/ranked trainers.
+
+- **GET** `?q=<free-text>&page=1&per_page=12` — Parse intent, fetch available trainers, score, sort, paginate.
+- Returns `{ data: [{...trainer, _score, _breakdown}], intent, count, page, per_page }`
+- `intent` field shows the parsed `SearchIntent` for frontend transparency (e.g., "We understood: weight loss, in Dubai, beginner").
+- Pre-filters at DB level: `is_available = true`, `hourly_rate <= maxRate` (when budget detected).
+- Auth required (same Bearer token pattern as other functions).
+
+**Pipeline:** `parseSearchIntent(q)` → DB fetch → `scoreTrainers(intent, trainers)` → paginate → respond.
+
+### Deep Search Modules (`supabase/functions/_shared/deep-search/`)
+
+Pure TypeScript modules with no Deno-specific dependencies (testable with Vitest under Node):
+
+- **`types.ts`** — `SearchIntent`, `TrainerForScoring`, `ScoredTrainer` interfaces.
+- **`keyword-maps.ts`** — Deterministic keyword dictionaries mapping natural language to database values. Covers all 45 specializations from seed data, plus training styles, fitness levels, health conditions, and budget patterns.
+- **`intent-parser.ts`** — `parseSearchIntent(query: string): SearchIntent`. Extracts goals, training style, fitness level, city, max budget, and health conditions from free-text. Keywords sorted by length descending for greedy matching. City extraction uses capitalized-word regex on the original (pre-lowered) text.
+- **`scoring-engine.ts`** — `scoreTrainers(intent, trainers): ScoredTrainer[]`. 100-point scoring: Goal (0-40), Style (0-20, always 20 for MVP since trainer_profiles lacks a training_style column), Level (0-20, maps fitness level to experience_years ranges), Location (0-20, city match = 20, country-only = 10). Filters by maxRate. Sorts by score desc → experience desc → name asc.
+
 ### Shared modules
 
 - `supabase/functions/_shared/cors.ts` — CORS headers used by all Edge Functions.
@@ -207,3 +236,16 @@ Auth & location handling identical to `trainer-profile`.
 
 - `scripts/trainer-profile-requests.sh` — Curl script to sign in, create a trainer profile, retrieve it, and update it against local Supabase. Run with `bash scripts/trainer-profile-requests.sh`.
 - `scripts/user-profile-requests.sh` — Curl script to sign in, create a user profile, retrieve it, and update it against local Supabase. Run with `bash scripts/user-profile-requests.sh`.
+
+## Seed Data
+
+`supabase/seed.sql` populates 50 fake trainer profiles (applied automatically by `npx supabase db reset`). Covers 45 distinct specializations across 30+ cities in 20+ countries. Notable profiles for testing:
+
+- **#1 Sarah Johnson** — weight_loss, New York, $85/hr (good test for "lose weight in New York")
+- **#5 Emma Williams** — rehabilitation, London, $75/hr (good test for "rehab in London")
+- **#8 Fatima Hassan** — prenatal/postnatal, Dubai, $150/hr (good test for "pregnancy in Dubai")
+- **#33 Luis Hernandez** — budget trainer, Mexico City, $20/hr (lowest rate)
+- **#34 Maximilian Stone** — celebrity trainer, Los Angeles, $300/hr (highest rate)
+- **#35, #36** — unavailable trainers (test availability filter)
+- **#37 Tyler Green** — 0 years experience (test beginner matching)
+- **#50 Katarina Muller** — 7 specializations (test multi-specialization scoring)
