@@ -89,42 +89,18 @@ export function TrainerDiscovery() {
       if (currentFilters.minExperience) params.set("min_experience", currentFilters.minExperience);
       if (currentFilters.maxExperience) params.set("max_experience", currentFilters.maxExperience);
 
-      // getUser() validates the token server-side and triggers a refresh if expired
-      const { error: userError } = await supabase.auth.getUser();
-      if (userError) {
-        setError("You must be logged in to browse trainers.");
-        setLoading(false);
-        return;
-      }
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        setError("You must be logged in to browse trainers.");
-        setLoading(false);
-        return;
-      }
-
-      const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const res = await fetch(
-        `${baseUrl}/functions/v1/trainer-profile?${params.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-          },
-        },
+      const { data, error: invokeError } = await supabase.functions.invoke(
+        `trainer-profile?${params.toString()}`,
+        { method: "GET" },
       );
 
-      const result = await res.json();
-
-      if (!res.ok) {
-        setError(result.error || "Failed to fetch trainers");
+      if (invokeError) {
+        setError(invokeError.message || "Failed to fetch trainers");
         setLoading(false);
         return;
       }
+
+      const result = data;
 
       setTrainers(result.data || []);
       setCount(result.count || 0);
