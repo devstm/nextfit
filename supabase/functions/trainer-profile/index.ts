@@ -1,6 +1,7 @@
 // deno-lint-ignore-file
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { corsHeaders } from "../_shared/cors.ts";
+import { authenticate, type AuthResult } from "../_shared/auth.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -175,35 +176,26 @@ function validateTrainerInput(
 // Handlers
 // ---------------------------------------------------------------------------
 
-async function handleGet(
+async function handleGetById(
   supabase: SupabaseClient,
-  req: Request,
+  profileId: string,
+): Promise<Response> {
+  const { data, error } = await supabase
+    .from("trainer_profiles")
+    .select("*")
+    .eq("id", profileId)
+    .single();
+
+  if (error) {
+    return jsonResponse({ error: "Profile not found" }, 404);
+  }
+  return jsonResponse({ data });
+}
+
+async function handleGetOwn(
+  supabase: SupabaseClient,
   user: User,
 ): Promise<Response> {
-  const url = new URL(req.url);
-  const profileId = url.searchParams.get("id");
-  const isList = url.searchParams.get("list") === "true";
-
-  // Single profile by id
-  if (profileId) {
-    const { data, error } = await supabase
-      .from("trainer_profiles")
-      .select("*")
-      .eq("id", profileId)
-      .single();
-
-    if (error) {
-      return jsonResponse({ error: "Profile not found" }, 404);
-    }
-    return jsonResponse({ data });
-  }
-
-  // List/search mode
-  if (isList) {
-    return await handleList(supabase, url);
-  }
-
-  // No id param and not list — return the caller's own profile
   const { data, error } = await supabase
     .from("trainer_profiles")
     .select("*")
@@ -388,37 +380,40 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // Auth
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return jsonResponse({ error: "Missing authorization header" }, 401);
+    // For GET requests that are public (list or single profile by id),
+    // allow both service-secret and JWT auth.
+    // For all other operations, require JWT.
+    if (req.method === "GET") {
+      const url = new URL(req.url);
+      const profileId = url.searchParams.get("id");
+      const isList = url.searchParams.get("list") === "true";
+
+      if (isList || profileId) {
+        // Public GET — accept service secret OR JWT
+        const authResult = await authenticate(req);
+        if (authResult instanceof Response) return authResult;
+        return isList
+          ? await handleList(authResult.client, url)
+          : await handleGetById(authResult.client, profileId!);
+      }
+
+      // GET own profile — requires JWT
+      const authResult = await authenticateJwt(req);
+      if (authResult instanceof Response) return authResult;
+      return await handleGetOwn(authResult.client, authResult.user);
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } },
-    );
+    // POST / PUT / DELETE — require JWT
+    const authResult = await authenticateJwt(req);
+    if (authResult instanceof Response) return authResult;
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return jsonResponse({ error: "Unauthorized" }, 401);
-    }
-
-    // Route by method
     switch (req.method) {
-      case "GET":
-        return await handleGet(supabase, req, user);
       case "POST":
-        return await handlePost(supabase, req, user);
+        return await handlePost(authResult.client, req, authResult.user);
       case "PUT":
-        return await handlePut(supabase, req, user);
+        return await handlePut(authResult.client, req, authResult.user);
       case "DELETE":
-        return await handleDelete(supabase, req, user);
+        return await handleDelete(authResult.client, req, authResult.user);
       default:
         return jsonResponse({ error: "Method not allowed" }, 405);
     }
@@ -430,3 +425,33 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Internal server error" }, 500);
   }
 });
+
+// ---------------------------------------------------------------------------
+// JWT-only auth (for write operations and own-profile reads)
+// ---------------------------------------------------------------------------
+
+async function authenticateJwt(
+  req: Request,
+): Promise<{ client: SupabaseClient; user: User } | Response> {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return jsonResponse({ error: "Missing authorization header" }, 401);
+  }
+
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: authHeader } } },
+  );
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return jsonResponse({ error: "Unauthorized" }, 401);
+  }
+
+  return { client: supabase, user };
+}

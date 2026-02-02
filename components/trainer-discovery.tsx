@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -77,7 +76,6 @@ export function TrainerDiscovery() {
       setLoading(true);
       setError(null);
 
-      const supabase = createClient();
       const params = new URLSearchParams({ list: "true", page: String(currentPage), per_page: String(perPage) });
 
       if (currentFilters.search) params.set("search", currentFilters.search);
@@ -89,18 +87,15 @@ export function TrainerDiscovery() {
       if (currentFilters.minExperience) params.set("min_experience", currentFilters.minExperience);
       if (currentFilters.maxExperience) params.set("max_experience", currentFilters.maxExperience);
 
-      const { data, error: invokeError } = await supabase.functions.invoke(
-        `trainer-profile?${params.toString()}`,
-        { method: "GET" },
-      );
+      const response = await fetch(`/api/trainers?${params.toString()}`);
 
-      if (invokeError) {
-        setError(invokeError.message || "Failed to fetch trainers");
+      if (!response.ok) {
+        setError("Failed to fetch trainers");
         setLoading(false);
         return;
       }
 
-      const result = data;
+      const result = await response.json();
 
       setTrainers(result.data || []);
       setCount(result.count || 0);

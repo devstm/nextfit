@@ -1,6 +1,6 @@
 // deno-lint-ignore-file
-import { createClient } from "@supabase/supabase-js";
 import { corsHeaders } from "../_shared/cors.ts";
+import { authenticate } from "../_shared/auth.ts";
 import { parseSearchIntent } from "../_shared/deep-search/intent-parser.ts";
 import { scoreTrainers } from "../_shared/deep-search/scoring-engine.ts";
 import type { TrainerForScoring } from "../_shared/deep-search/types.ts";
@@ -35,25 +35,10 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // Auth — same pattern as trainer-profile
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return jsonResponse({ error: "Missing authorization header" }, 401);
-    }
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } },
-    );
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return jsonResponse({ error: "Unauthorized" }, 401);
-    }
+    // Auth — accept service secret (public) or JWT (authenticated)
+    const authResult = await authenticate(req);
+    if (authResult instanceof Response) return authResult;
+    const supabase = authResult.client;
 
     // Parse query params
     const url = new URL(req.url);
